@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
         String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
         user.setPassword(hashPassword);
         user.setRepeat_password(hashPassword);
+        user.setRole("salesperson");
 
         return userRepo.save(user);
 
@@ -176,6 +177,7 @@ public class UserServiceImpl implements UserService {
                     .address(tempUser.getAddress())
                     .otp(tempUser.getOtp())
                     .isEmailVerified(true)
+                    .role("salesperson")
                     .localDateTime(LocalDateTime.now())
                     .build();
 
@@ -212,7 +214,7 @@ public class UserServiceImpl implements UserService {
     // }
 
     private void sendVerificationEmail(String firstname, String email, String otp){
-        String subject = "Email Verification: VicharStream!!!";
+        String subject = "Email Verification: Invenquity!!!";
         String body = EmailTemplate.getEmailTemplateForVerifyUser(firstname, otp);
         emailService.sendEmail(email, subject, body);
     }
@@ -236,5 +238,10 @@ public class UserServiceImpl implements UserService {
             logger.warn("User does not exist");
             throw new RuntimeException("User does not exist");
         }
+    }
+
+    @Override
+    public Optional<User> getUserByUsername(String username) {
+        return userRepo.findByUsername(username);
     }
 }

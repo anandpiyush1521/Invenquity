@@ -97,7 +97,7 @@ public class UserController {
             User loggedInUser = userService.loginSecurity(authenticationRequest);
             final UserDetails userDetails = customUserDetailsService.loadUserByUsername(loggedInUser.getUsername());
         
-            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), loggedInUser.getEmail(), loggedInUser.getFirst_name(), loggedInUser.getAddress());    
+            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), loggedInUser.getEmail(), loggedInUser.getRole(), loggedInUser.getFirst_name(), loggedInUser.getAddress());    
 
             AuthenticationRespJwt authenticationRespJwt = new AuthenticationRespJwt(jwt);
 

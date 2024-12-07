@@ -30,10 +30,11 @@ public class JwtUtil {
         logger.info("JWT expiration: {}", expiration);
     }
 
-    public String generateToken(String username, String email, String firstName, String address) {
+    public String generateToken(String username, String email, String role, String firstName, String address) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("email", email)
+                .claim("role", role)
                 .claim("first_name", firstName)
                 .claim("address", address)
                 .setIssuedAt(new Date())
