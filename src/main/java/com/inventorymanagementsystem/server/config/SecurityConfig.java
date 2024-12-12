@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/invenquity/login").permitAll()
                 .requestMatchers("/api/invenquity/request-otp").permitAll()
                 .requestMatchers("/api/invenquity/verify-otp").permitAll()
-                .requestMatchers("/api/invenquity/user/**").hasRole("admin")
+                .requestMatchers("/api/invenquity/user/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement()

@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
         user.setPassword(hashPassword);
         user.setRepeat_password(hashPassword);
-        user.setRole("salesperson");
+        user.setRole("SALESPERSON");
 
         return userRepo.save(user);
 
@@ -65,23 +65,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> updateUser(User user) {
-        User user2 = userRepo.findById(user.getId()).orElseThrow(() ->new ResourceNotFoundException("User not found"));
-        user2.setEmail(user.getEmail());
-        user2.setUsername(user.getUsername());
+        User existingUser = userRepo.findById(user.getId()).orElseThrow(() ->new ResourceNotFoundException("User not found"));
+        existingUser.setEmail(user.getEmail());
+        existingUser.setUsername(user.getUsername());
 
-        String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
-        user2.setPassword(hashPassword);
-        user2.setRepeat_password(hashPassword);
-        user2.setFirst_name(user.getFirst_name());
-        user2.setLast_name(user.getLast_name());
-        user2.setPhone(user.getPhone());
-        user2.setAddress(user.getAddress());
-        user2.setEmailVerified(user.isEmailVerified());
+        if(user.getPassword() != null && !user.getPassword().isEmpty()){
+            String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
+            existingUser.setPassword(hashPassword);
+            existingUser.setRepeat_password(hashPassword);
+        }
+
+        existingUser.setFirst_name(user.getFirst_name());
+        existingUser.setLast_name(user.getLast_name());
+        existingUser.setPhone(user.getPhone());
+        existingUser.setAddress(user.getAddress());
+        
+        if(!existingUser.isEmailVerified()){
+            existingUser.setEmailVerified(user.isEmailVerified());
+        }
 
         //save the updated user
-        User save = userRepo.save(user2);
+        User saveUser = userRepo.save(existingUser);
 
-        return Optional.ofNullable(save);
+        return Optional.ofNullable(saveUser);
     }
 
     @Override
@@ -177,7 +183,7 @@ public class UserServiceImpl implements UserService {
                     .address(tempUser.getAddress())
                     .otp(tempUser.getOtp())
                     .isEmailVerified(true)
-                    .role("salesperson")
+                    .role("SALESPERSON")
                     .localDateTime(LocalDateTime.now())
                     .build();
 
