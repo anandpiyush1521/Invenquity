@@ -2,6 +2,7 @@ package com.inventorymanagementsystem.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +34,7 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerUser(@RequestBody User user){
         if(userService.isUserExistByEmail(user.getEmail())){
             return ResponseEntity.badRequest().body("User with email already exists");
@@ -44,6 +46,7 @@ public class UserController {
 
     //verify
     @PostMapping("/verify")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> verifyUser(@RequestParam String email, @RequestParam String otp){
         try {
             userService.verify(email, otp);

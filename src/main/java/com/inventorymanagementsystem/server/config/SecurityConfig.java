@@ -32,8 +32,8 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/invenquity/register").permitAll()
-                .requestMatchers("/api/invenquity/verify").permitAll()
+                .requestMatchers("/api/invenquity/register").hasRole("ADMIN")
+                .requestMatchers("/api/invenquity/verify").hasRole("ADMIN")
                 .requestMatchers("/api/invenquity/login").permitAll()
                 .requestMatchers("/api/invenquity/request-otp").permitAll()
                 .requestMatchers("/api/invenquity/verify-otp").permitAll()
