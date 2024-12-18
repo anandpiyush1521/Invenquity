@@ -1,5 +1,6 @@
 package com.inventorymanagementsystem.server.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.inventorymanagementsystem.server.dto.request.AuthenticationRequest;
@@ -16,6 +17,10 @@ public interface UserService {
 
     Optional<User> getUserByEmail(String email);
     Optional<User> getUserByUsername(String username);
+
+    Optional<User> updateByUsernameOrEmail(String identifier, User user);
+    List<User> getAllUsers();
+    void deleteUserByUsernameorEmail(String identifier);
 
     User register(User user);
     void verify(String email, String otp);

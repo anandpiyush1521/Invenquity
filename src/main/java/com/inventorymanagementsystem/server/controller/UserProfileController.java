@@ -1,5 +1,7 @@
 package com.inventorymanagementsystem.server.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,8 +23,18 @@ public class UserProfileController {
     @Autowired
     private UserService userService;
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchAllUsers() {
+        try {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while fetching all users");
+        }
+    }
+
     // Fetch User Profile (Admin only)
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> fetchUserProfile(@PathVariable String id) {
         try {
@@ -36,8 +48,36 @@ public class UserProfileController {
         }
     }
 
+    @GetMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchUserProfileByUsername(@PathVariable String username) {
+        try {
+            return userService.getUserByUsername(username)
+                    .map(ResponseEntity::ok)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch(Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while fetching the user profile");
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> fetchUserProfileByEmail(@PathVariable String email) {
+        try {
+            return userService.getUserByEmail(email)
+                    .map(ResponseEntity::ok)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch(Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while fetching the user profile");
+        }
+    }
+
     // Update User Profile (Admin only)
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUserProfile(@PathVariable String id, @RequestBody User user) {
         try {
@@ -50,12 +90,37 @@ public class UserProfileController {
         }
     }
 
+    @PutMapping("/update/{identifier}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateUserByUsernameOrEmail(@PathVariable String identifier, @RequestBody User user) {
+        Optional<User> updatedUser = userService.updateByUsernameOrEmail(identifier, user);
+
+        if(updatedUser.isPresent()) {
+            return ResponseEntity.ok(updatedUser.get());
+        } else {
+            return ResponseEntity.status(404).body("User not found");
+        }
+    }
+
     // Delete User Profile (Admin only)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUserProfile(@PathVariable String id) {
         try {
             userService.deleteUser(id);
+            return ResponseEntity.ok("User deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while deleting the user profile");
+        }
+    }
+
+    @DeleteMapping("/delete/{identifier}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUserByUsernameOrEmail(@PathVariable String identifier) {
+        try {
+            userService.deleteUserByUsernameorEmail(identifier);
             return ResponseEntity.ok("User deleted successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());

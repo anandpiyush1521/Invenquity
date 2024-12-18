@@ -22,6 +22,7 @@ import com.inventorymanagementsystem.server.util.JwtUtil;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -174,7 +175,7 @@ public class UserServiceImpl implements UserService {
             User user = User.builder()
                     .id(UUID.randomUUID().toString())
                     .email(tempUser.getEmail())
-                    .username(tempUser.getUsername())
+                    .username(tempUser.getUsername().toLowerCase())
                     .password(hashPassword)
                     .repeat_password(hashPassword)
                     .first_name(tempUser.getFirst_name())
@@ -249,5 +250,48 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserByUsername(String username) {
         return userRepo.findByUsername(username);
+    }
+
+    @Override
+    public Optional<User> updateByUsernameOrEmail(String identifier, User user) {
+        Optional<User> userOptional = userRepo.findByUsernameOrEmail(identifier, identifier);
+
+        if(userOptional.isPresent()) {
+            User existingUser = userOptional.get();
+            existingUser.setEmail(user.getEmail());
+            existingUser.setUsername(user.getUsername());
+            
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
+                existingUser.setPassword(hashPassword);
+                existingUser.setRepeat_password(hashPassword);
+            }
+
+            existingUser.setFirst_name(user.getFirst_name());
+            existingUser.setLast_name(user.getLast_name());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setAddress(user.getAddress());
+        
+            if(!existingUser.isEmailVerified()){
+                existingUser.setEmailVerified(user.isEmailVerified());
+            }
+
+            userRepo.save(existingUser);
+            return Optional.of(existingUser);
+        }else{
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
+    }
+
+    @Override
+    public void deleteUserByUsernameorEmail(String identifier) {
+        User user = userRepo.findByUsernameOrEmail(identifier, identifier)
+                        .orElseThrow(() -> new ResourceNotFoundException("User not Found"));
+        userRepo.delete(user);
     }
 }
