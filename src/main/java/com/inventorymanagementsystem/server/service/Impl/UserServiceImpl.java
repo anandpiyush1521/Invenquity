@@ -1,7 +1,5 @@
 package com.inventorymanagementsystem.server.service.Impl;
 
-
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -16,16 +14,14 @@ import com.inventorymanagementsystem.server.helper.EmailTemplate;
 import com.inventorymanagementsystem.server.helper.GenerateOtp;
 import com.inventorymanagementsystem.server.helper.PasswordBcrypt;
 import com.inventorymanagementsystem.server.helper.ResourceNotFoundException;
+import com.inventorymanagementsystem.server.helper.UserIdGenerator;
 import com.inventorymanagementsystem.server.repositories.UserRepo;
 import com.inventorymanagementsystem.server.service.UserService;
 import com.inventorymanagementsystem.server.util.JwtUtil;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,7 +43,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
-        String userId = UUID.randomUUID().toString();
+        String userId;
+        do {
+            userId = UserIdGenerator.generateProductId();
+        } while (userRepo.existsById(userId));
         user.setId(userId);
 
         String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
@@ -56,7 +55,6 @@ public class UserServiceImpl implements UserService {
         user.setRole("SALESPERSON");
 
         return userRepo.save(user);
-
     }
 
     @Override
@@ -66,11 +64,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> updateUser(User user) {
-        User existingUser = userRepo.findById(user.getId()).orElseThrow(() ->new ResourceNotFoundException("User not found"));
+        User existingUser = userRepo.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         existingUser.setEmail(user.getEmail());
         existingUser.setUsername(user.getUsername());
 
-        if(user.getPassword() != null && !user.getPassword().isEmpty()){
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
             existingUser.setPassword(hashPassword);
             existingUser.setRepeat_password(hashPassword);
@@ -80,12 +78,12 @@ public class UserServiceImpl implements UserService {
         existingUser.setLast_name(user.getLast_name());
         existingUser.setPhone(user.getPhone());
         existingUser.setAddress(user.getAddress());
-        
-        if(!existingUser.isEmailVerified()){
+
+        if (!existingUser.isEmailVerified()) {
             existingUser.setEmailVerified(user.isEmailVerified());
         }
 
-        //save the updated user
+        // Save the updated user
         User saveUser = userRepo.save(existingUser);
 
         return Optional.ofNullable(saveUser);
@@ -100,13 +98,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUserExistByEmail(String email) {
         User user = userRepo.findByEmail(email).orElse(null);
-        return user!=null ? true : false;
+        return user != null;
     }
 
     @Override
     public boolean isUserExistByEmailAndPassword(String email, String password) {
         User user = userRepo.findByEmailAndPassword(email, password).orElse(null);
-        return user!=null ? true : false;
+        return user != null;
     }
 
     @Override
@@ -117,12 +115,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
         User existingUserByEmail = userRepo.findByEmail(user.getEmail()).orElse(null);
-        if(existingUserByEmail!=null && existingUserByEmail.isEmailVerified()){
+        if (existingUserByEmail != null && existingUserByEmail.isEmailVerified()) {
             throw new RuntimeException("User already exist and verified");
         }
 
         User existingByUsername = userRepo.findByUsername(user.getUsername()).orElse(null);
-        if(existingByUsername!=null){
+        if (existingByUsername != null) {
             throw new RuntimeException("Username already exist");
         }
 
@@ -140,7 +138,7 @@ public class UserServiceImpl implements UserService {
                 LocalDateTime.now()
         );
 
-        //Store the temporary user object in the map
+        // Store the temporary user object in the map
         tempUserStore.put(tempUser.getEmail(), tempUser);
 
         sendVerificationEmail(tempUser.getFirst_name(), tempUser.getEmail(), tempUser.getOtp());
@@ -161,19 +159,24 @@ public class UserServiceImpl implements UserService {
     public void verify(String email, String otp) {
         TempUser tempUser = tempUserStore.get(email);
 
-        if(tempUser == null){
+        if (tempUser == null) {
             logger.warn("User Not Found");
             throw new RuntimeException("User Not Found");
-        }else if(!otp.equals(tempUser.getOtp())){
+        } else if (!otp.equals(tempUser.getOtp())) {
             logger.warn("Invalid Otp");
             throw new RuntimeException("Invalid Otp");
-        }else if(tempUser.getOtpGeneratedTime().plusMinutes(2).isBefore(LocalDateTime.now())){
+        } else if (tempUser.getOtpGeneratedTime().plusMinutes(2).isBefore(LocalDateTime.now())) {
             logger.warn("OTP expired");
             throw new RuntimeException("OTP expired");
-        }else{
+        } else {
             String hashPassword = PasswordBcrypt.hashPassword(tempUser.getPassword());
+            String userId;
+            do {
+                userId = UserIdGenerator.generateProductId();
+            } while (userRepo.existsById(userId));
+
             User user = User.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(userId)
                     .email(tempUser.getEmail())
                     .username(tempUser.getUsername().toLowerCase())
                     .password(hashPassword)
@@ -199,28 +202,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(String email, String password) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
-            if(PasswordBcrypt.checkPassword(password, existingUser.getPassword())) {
+            if (PasswordBcrypt.checkPassword(password, existingUser.getPassword())) {
                 logger.info("User logged in successfully");
                 return existingUser;
-            }else{
+            } else {
                 logger.warn("Invalid Password");
                 throw new RuntimeException("Invalid Password");
             }
-        }else{
+        } else {
             logger.warn("User Does not exist");
             throw new RuntimeException("User Does not exist");
         }
     }
 
-    // private String generateOtp(){
-    //     Random random = new Random();
-    //     int otpValue = 100000 + random.nextInt(900000);
-    //     return String.valueOf(otpValue);
-    // }
-
-    private void sendVerificationEmail(String firstname, String email, String otp){
+    private void sendVerificationEmail(String firstname, String email, String otp) {
         String subject = "Email Verification: Invenquity!!!";
         String body = EmailTemplate.getEmailTemplateForVerifyUser(firstname, otp);
         emailService.sendEmail(email, subject, body);
@@ -230,9 +227,9 @@ public class UserServiceImpl implements UserService {
     public User loginSecurity(AuthenticationRequest authenticationRequest) {
         // Check if the provided username is an email or regular username
         Optional<User> optionalUser = userRepo.findByUsername(authenticationRequest.getUsername())
-                                        .or(() -> userRepo.findByEmail(authenticationRequest.getUsername()));
+                .or(() -> userRepo.findByEmail(authenticationRequest.getUsername()));
 
-        if (optionalUser != null) {
+        if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
             if (PasswordBcrypt.checkPassword(authenticationRequest.getPassword(), existingUser.getPassword())) {
                 logger.info("User logged in successfully");
@@ -256,11 +253,11 @@ public class UserServiceImpl implements UserService {
     public Optional<User> updateByUsernameOrEmail(String identifier, User user) {
         Optional<User> userOptional = userRepo.findByUsernameOrEmail(identifier, identifier);
 
-        if(userOptional.isPresent()) {
+        if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
             existingUser.setEmail(user.getEmail());
             existingUser.setUsername(user.getUsername());
-            
+
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
                 existingUser.setPassword(hashPassword);
@@ -271,14 +268,14 @@ public class UserServiceImpl implements UserService {
             existingUser.setLast_name(user.getLast_name());
             existingUser.setPhone(user.getPhone());
             existingUser.setAddress(user.getAddress());
-        
-            if(!existingUser.isEmailVerified()){
+
+            if (!existingUser.isEmailVerified()) {
                 existingUser.setEmailVerified(user.isEmailVerified());
             }
 
             userRepo.save(existingUser);
             return Optional.of(existingUser);
-        }else{
+        } else {
             return Optional.empty();
         }
     }
@@ -291,7 +288,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserByUsernameorEmail(String identifier) {
         User user = userRepo.findByUsernameOrEmail(identifier, identifier)
-                        .orElseThrow(() -> new ResourceNotFoundException("User not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not Found"));
         userRepo.delete(user);
     }
 }
