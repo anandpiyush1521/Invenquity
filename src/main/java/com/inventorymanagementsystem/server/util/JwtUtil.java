@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,9 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private long expiration;
+
+    // Blacklist to store invalidated tokens
+    private static final Map<String, Boolean> invalidatedTokens = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -44,8 +48,21 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token, String username) {
+        return !isTokenInvalidated(token) && isValidTokenForUser(token, username);
+    }
+
+    private boolean isValidTokenForUser(String token, String username) {
         String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        return extractedUsername.equals(username) && !isTokenExpired(token);
+    }
+
+    public void invalidateToken(String token) {
+        invalidatedTokens.put(token, true);
+        logger.info("Token invalidated: {}", token);
+    }
+
+    private boolean isTokenInvalidated(String token) {
+        return invalidatedTokens.getOrDefault(token, false);
     }
 
     public String extractUsername(String token) {
@@ -84,6 +101,7 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
+            logger.error("Token has expired: {}", token);
             throw new RuntimeException("Token has expired", e);
         }
     }

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.inventorymanagementsystem.server.dto.request.AuthenticationRequest;
@@ -290,5 +292,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findByUsernameOrEmail(identifier, identifier)
                 .orElseThrow(() -> new ResourceNotFoundException("User not Found"));
         userRepo.delete(user);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+
+        return userRepo.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

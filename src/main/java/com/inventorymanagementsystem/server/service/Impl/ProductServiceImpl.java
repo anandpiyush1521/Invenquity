@@ -12,6 +12,7 @@ import com.inventorymanagementsystem.server.helper.ResourceNotFoundException;
 import com.inventorymanagementsystem.server.repositories.ProductRepo;
 import com.inventorymanagementsystem.server.repositories.UserRepo;
 import com.inventorymanagementsystem.server.service.ProductService;
+import com.inventorymanagementsystem.server.service.UserService;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -22,6 +23,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public Product addProduct(Product product) {
         String generatedId;
@@ -31,7 +35,10 @@ public class ProductServiceImpl implements ProductService {
         product.setId(generatedId);
 
         // Ensure the user is set
-        if (product.getUser() != null && product.getUser().getId() != null) {
+        if (product.getUser() == null) {
+            User currentUser = userService.getCurrentUser();
+            product.setUser(currentUser);
+        } else if (product.getUser().getId() != null) {
             User user = userRepo.findById(product.getUser().getId()).orElseThrow(() -> new RuntimeException("User not found"));
             product.setUser(user);
         }

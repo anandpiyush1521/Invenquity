@@ -110,4 +110,18 @@ public class UserController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String token) {
+        try {
+            // Extract the JWT token by removing the "Bearer " prefix
+            String jwtToken = token.replace("Bearer ", "");
+
+            // Invalidate the token (you need to implement the logic for token invalidation)
+            jwtUtil.invalidateToken(jwtToken);
+
+            return ResponseEntity.ok("User logged out successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Logout failed: " + e.getMessage());
+        }
+    }
 }

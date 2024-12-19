@@ -26,4 +26,6 @@ public interface UserService {
     void verify(String email, String otp);
     User login(String email, String password);
     User loginSecurity(AuthenticationRequest authenticationRequest);
+
+    User getCurrentUser();
 }
