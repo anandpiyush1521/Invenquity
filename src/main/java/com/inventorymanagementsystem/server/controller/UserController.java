@@ -3,8 +3,6 @@ package com.inventorymanagementsystem.server.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +13,12 @@ import com.inventorymanagementsystem.server.service.UserService;
 import com.inventorymanagementsystem.server.service.Impl.CustomUserDetailsService;
 import com.inventorymanagementsystem.server.util.JwtUtil;
 
-import java.util.Map;
-import java.util.Optional;
-
 @RequestMapping("/api/invenquity")
 @RestController
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;

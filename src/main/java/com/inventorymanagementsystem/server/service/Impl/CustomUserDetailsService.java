@@ -1,6 +1,5 @@
 package com.inventorymanagementsystem.server.service.Impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;

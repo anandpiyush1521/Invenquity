@@ -19,7 +19,6 @@ import com.inventorymanagementsystem.server.helper.ResourceNotFoundException;
 import com.inventorymanagementsystem.server.helper.UserIdGenerator;
 import com.inventorymanagementsystem.server.repositories.UserRepo;
 import com.inventorymanagementsystem.server.service.UserService;
-import com.inventorymanagementsystem.server.util.JwtUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,11 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
+    
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
