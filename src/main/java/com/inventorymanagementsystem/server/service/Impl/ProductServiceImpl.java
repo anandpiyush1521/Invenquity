@@ -1,15 +1,19 @@
 package com.inventorymanagementsystem.server.service.Impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.inventorymanagementsystem.server.entities.Notification;
 import com.inventorymanagementsystem.server.entities.Product;
 import com.inventorymanagementsystem.server.entities.User;
 import com.inventorymanagementsystem.server.helper.EmailTemplate;
+import com.inventorymanagementsystem.server.helper.NotificationIdGenerator;
 import com.inventorymanagementsystem.server.helper.ProductIdGenerator;
 import com.inventorymanagementsystem.server.helper.ResourceNotFoundException;
+import com.inventorymanagementsystem.server.repositories.NotificationRepo;
 import com.inventorymanagementsystem.server.repositories.ProductRepo;
 import com.inventorymanagementsystem.server.repositories.UserRepo;
 import com.inventorymanagementsystem.server.service.ProductService;
@@ -29,6 +33,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private EmailService emailService; 
+
+    @Autowired
+    private NotificationRepo notificationRepo;
 
     @Override
     public Product addProduct(Product product) {
@@ -175,6 +182,20 @@ public class ProductServiceImpl implements ProductService {
         for (String email : adminEmails) {
             emailService.sendEmail(email, subject, htmlContent);
         }
+
+        String notificationId;
+        do{
+            notificationId = NotificationIdGenerator.generateNotificationId(product.getSkuCode());
+        }while(notificationRepo.existsById(notificationId));
+
+        Notification notification = Notification.builder()
+            .id(notificationId)
+            .message("Warning: The quantity of product " + product.getProductName() + " (SKU: " + product.getSkuCode() + ") is below the minimum threshold.")
+            .createdAt(LocalDateTime.now())
+            .isRead(false)
+            .build();
+        
+        notificationRepo.save(notification);
 
     }
 }
