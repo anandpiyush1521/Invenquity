@@ -179,5 +179,78 @@ public class EmailTemplate {
                 "</div>" +
                 "</body>" +
                 "</html>";
-    }    
+    }
+    
+    public static String getEmailTemplateForNotifyAdmins(String productName, String skuCode, int currentQuantity, int minimumQuantity) {
+        return "<html>" +
+                "<head>" +
+                "<style>" +
+                "body {" +
+                "    font-family: Arial, sans-serif;" +
+                "    background-color: #f4f4f4;" +
+                "    margin: 0;" +
+                "    padding: 0;" +
+                "}" +
+                ".container {" +
+                "    width: 100%;" +
+                "    max-width: 600px;" +
+                "    margin: 0 auto;" +
+                "    background-color: #ffffff;" +
+                "    padding: 20px;" +
+                "    border-radius: 10px;" +
+                "    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);" +
+                "}" +
+                ".header {" +
+                "    text-align: center;" +
+                "    padding: 10px 0;" +
+                "    border-bottom: 1px solid #eeeeee;" +
+                "}" +
+                ".header img {" +
+                "    max-width: 100%;" +
+                "    height: auto;" +
+                "    border-radius: 10px 10px 0 0;" +
+                "}" +
+                ".content {" +
+                "    padding: 20px;" +
+                "}" +
+                ".content h2 {" +
+                "    color: #333333;" +
+                "    font-size: 24px;" +
+                "    margin-bottom: 10px;" +
+                "}" +
+                ".content p {" +
+                "    font-size: 16px;" +
+                "    color: #666666;" +
+                "    line-height: 1.5;" +
+                "}" +
+                ".footer {" +
+                "    text-align: center;" +
+                "    padding: 10px 0;" +
+                "    border-top: 1px solid #eeeeee;" +
+                "    font-size: 14px;" +
+                "    color: #aaaaaa;" +
+                "}" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class=\"container\">" +
+                "    <div class=\"header\">" +
+                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1733409856/InvenquityLogo_fck9ue.png\" alt=\"Banner\">" +
+                "        <h2>Product Quantity Alert</h2>" +
+                "    </div>" +
+                "    <div class=\"content\">" +
+                "        <h2>Attention Admins,</h2>" +
+                "        <p>The quantity of the product <strong>" + productName + "</strong> (SKU: <strong>" + skuCode + "</strong>) has fallen below the minimum threshold.</p>" +
+                "        <p>Current Quantity: <strong>" + currentQuantity + "</strong></p>" +
+                "        <p>Minimum Required Quantity: <strong>" + minimumQuantity + "</strong></p>" +
+                "        <p>Please take the necessary actions to restock the product and ensure availability.</p>" +
+                "    </div>" +
+                "    <div class=\"footer\">" +
+                "        <p>&copy; 2024 Inven<u>quity</u>. All rights reserved.</p>" +
+                "    </div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+    }
+    
 }

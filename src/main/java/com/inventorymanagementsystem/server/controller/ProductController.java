@@ -37,6 +37,11 @@ public class ProductController {
     public ResponseEntity<Product> updateProductBySkuCode(@PathVariable String skuCode, @RequestBody Product product) {
         try {
             Product updatedProduct = productService.updateProductBySkuCode(skuCode, product);
+
+            if(updatedProduct.getQuantity() <= updatedProduct.getMinimumProducts()){
+                productService.notifyAdmins(updatedProduct);
+            }
+
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,6 +53,11 @@ public class ProductController {
     public ResponseEntity<Product> updateProductByName(@PathVariable String productName, @RequestBody Product product) {
         try {
             Product updatedProduct = productService.updateProductByName(productName, product);
+
+            if(updatedProduct.getQuantity() <= updatedProduct.getMinimumProducts()){
+                productService.notifyAdmins(updatedProduct);
+            }
+
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +69,11 @@ public class ProductController {
     public ResponseEntity<Product> updateProductByCategory(@PathVariable String productCategory, @RequestBody Product product) {
         try {
             Product updatedProduct = productService.updateProductByCategory(productCategory, product);
+
+            if(updatedProduct.getQuantity() <= updatedProduct.getMinimumProducts()){
+                productService.notifyAdmins(updatedProduct);
+            }
+            
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
             e.printStackTrace();

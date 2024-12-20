@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.inventorymanagementsystem.server.entities.Product;
 import com.inventorymanagementsystem.server.entities.User;
+import com.inventorymanagementsystem.server.helper.EmailTemplate;
 import com.inventorymanagementsystem.server.helper.ProductIdGenerator;
 import com.inventorymanagementsystem.server.helper.ResourceNotFoundException;
 import com.inventorymanagementsystem.server.repositories.ProductRepo;
@@ -25,6 +26,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService; 
 
     @Override
     public Product addProduct(Product product) {
@@ -148,6 +152,29 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setMinimumProducts(newProduct.getMinimumProducts());
         existingProduct.setPrice(newProduct.getPrice());
         existingProduct.setDescription(newProduct.getDescription());
-        existingProduct.setUser(newProduct.getUser());
+
+        // Preserve the existing user if the new user is null
+        if (newProduct.getUser() != null) {
+            existingProduct.setUser(newProduct.getUser());
+        }
+    }
+
+    @Override
+    public void notifyAdmins(Product product) {
+        List<String> adminEmails = List.of("piyushanand2580@gmail.com", "nishasingh1772003@gmail.com");
+
+        String subject = "Product Quantity Alert";
+        
+        String htmlContent = EmailTemplate.getEmailTemplateForNotifyAdmins(
+            product.getProductName(),
+            product.getSkuCode(),
+            product.getQuantity(),
+            product.getMinimumProducts()
+        );
+
+        for (String email : adminEmails) {
+            emailService.sendEmail(email, subject, htmlContent);
+        }
+
     }
 }

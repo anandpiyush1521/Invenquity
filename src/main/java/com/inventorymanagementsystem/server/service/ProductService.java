@@ -22,4 +22,6 @@ public interface ProductService {
     void deleteProductByCategory(String productCategory);
 
     void checkProductQuantity(Product product);
+
+    void notifyAdmins(Product product);
 }
