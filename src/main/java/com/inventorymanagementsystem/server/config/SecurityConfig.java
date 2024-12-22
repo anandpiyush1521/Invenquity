@@ -1,6 +1,5 @@
 package com.inventorymanagementsystem.server.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,21 +15,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.inventorymanagementsystem.server.service.Impl.CustomUserDetailsService;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
 
-    @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configure(http)) // Enable CORS
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/invenquity/register").hasRole("ADMIN")
                 .requestMatchers("/api/invenquity/verify").hasRole("ADMIN")
@@ -42,22 +43,19 @@ public class SecurityConfig {
                 .requestMatchers("/api/invenquity/product/**").authenticated()
                 .anyRequest().authenticated()
             )
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 
-    // "/api/blogs/**"
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = 
+        AuthenticationManagerBuilder authManagerBuilder = 
             http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(customUserDetailsService)
+        authManagerBuilder.userDetailsService(customUserDetailsService)
             .passwordEncoder(passwordEncoder());
-        return authenticationManagerBuilder.build();
+        return authManagerBuilder.build();
     }
 
     @Bean
