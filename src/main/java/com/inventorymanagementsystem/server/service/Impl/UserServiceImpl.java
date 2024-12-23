@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.inventorymanagementsystem.server.dto.request.AuthenticationRequest;
+import com.inventorymanagementsystem.server.dto.response.UserDTO;
 import com.inventorymanagementsystem.server.entities.TempUser;
 import com.inventorymanagementsystem.server.entities.User;
 import com.inventorymanagementsystem.server.helper.EmailTemplate;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -280,8 +282,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepo.findAll();
+    public List<UserDTO> getAllUsers() {
+        // return userRepo.findAll();
+        List<User> users = userRepo.findAll();
+        return users.stream()
+                    .map(UserDTO::new)
+                    .collect(Collectors.toList());
     }
 
     @Override

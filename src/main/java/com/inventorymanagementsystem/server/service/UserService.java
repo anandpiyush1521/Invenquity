@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.inventorymanagementsystem.server.dto.request.AuthenticationRequest;
+import com.inventorymanagementsystem.server.dto.response.UserDTO;
 import com.inventorymanagementsystem.server.entities.User;
 
 public interface UserService {
@@ -19,7 +20,9 @@ public interface UserService {
     Optional<User> getUserByUsername(String username);
 
     Optional<User> updateByUsernameOrEmail(String identifier, User user);
-    List<User> getAllUsers();
+
+    List<UserDTO> getAllUsers();
+    
     void deleteUserByUsernameorEmail(String identifier);
 
     User register(User user);

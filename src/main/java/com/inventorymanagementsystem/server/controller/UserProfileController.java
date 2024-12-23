@@ -1,5 +1,6 @@
 package com.inventorymanagementsystem.server.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.inventorymanagementsystem.server.dto.response.UserDTO;
 import com.inventorymanagementsystem.server.entities.User;
 import com.inventorymanagementsystem.server.service.UserService;
 
@@ -27,7 +29,8 @@ public class UserProfileController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> fetchAllUsers() {
         try {
-            return ResponseEntity.ok(userService.getAllUsers());
+            List<UserDTO> userDTOs = userService.getAllUsers();
+            return ResponseEntity.ok(userDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("An error occurred while fetching all users");
         }
