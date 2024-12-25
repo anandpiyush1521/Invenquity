@@ -33,6 +33,17 @@ public class ProductController {
         }
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Product>> addProducts(@RequestBody List<Product> products) {
+        try {
+            List<Product> createdProducts = productService.addProducts(products);
+            return ResponseEntity.ok(createdProducts);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
     @PutMapping("/sku/{skuCode}")
     public ResponseEntity<Product> updateProductBySkuCode(@PathVariable String skuCode, @RequestBody Product product) {
         try {

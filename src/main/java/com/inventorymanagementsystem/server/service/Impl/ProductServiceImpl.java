@@ -58,6 +58,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> addProducts(List<Product> products) {
+        for (Product product : products) {
+            String generatedId;
+            do {
+                generatedId = ProductIdGenerator.generateProductId();
+            } while (productRepo.existsById(generatedId));
+            product.setId(generatedId);
+    
+            // Ensure the user is set
+            if (product.getUser() == null) {
+                User currentUser = userService.getCurrentUser();
+                product.setUser(currentUser);
+            } else if (product.getUser().getId() != null) {
+                User user = userRepo.findById(product.getUser().getId()).orElseThrow(() -> new RuntimeException("User not found"));
+                product.setUser(user);
+            }
+        }
+        return productRepo.saveAll(products);
+    }
+
+    @Override
     public Product updateProductBySkuCode(String skuCode, Product product) {
         List<Product> products = productRepo.findBySkuCodeIgnoreCase(skuCode);
         if (products.isEmpty()) {

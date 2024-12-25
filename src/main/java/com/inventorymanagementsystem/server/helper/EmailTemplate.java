@@ -74,7 +74,7 @@ public class EmailTemplate {
                 "<body>" +
                 "<div class=\"container\">" +
                 "    <div class=\"header\">" +
-                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1733409856/InvenquityLogo_fck9ue.png\" alt=\"Banner\">" +
+                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1735127095/b5qgg0b8myao8qsqmf4k.png\" alt=\"Banner\">" +
                 "    </div>" +
                 "    <div class=\"content\">" +
                 "        <h2>Hello " + firstName + ",</h2>" +
@@ -164,7 +164,7 @@ public class EmailTemplate {
                 "<body>" +
                 "<div class=\"container\">" +
                 "    <div class=\"header\">" +
-                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1733409856/InvenquityLogo_fck9ue.png\" alt=\"Banner\">" +
+                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1735127095/b5qgg0b8myao8qsqmf4k.png\" alt=\"Banner\">" +
                 "    </div>" +
                 "    <div class=\"content\">" +
                 "        <h2>Hello " + firstName + ",</h2>" +
@@ -235,7 +235,7 @@ public class EmailTemplate {
                 "<body>" +
                 "<div class=\"container\">" +
                 "    <div class=\"header\">" +
-                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1733409856/InvenquityLogo_fck9ue.png\" alt=\"Banner\">" +
+                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1735127095/b5qgg0b8myao8qsqmf4k.png\" alt=\"Banner\">" +
                 "        <h2>Product Quantity Alert</h2>" +
                 "    </div>" +
                 "    <div class=\"content\">" +

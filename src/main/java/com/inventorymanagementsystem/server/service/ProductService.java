@@ -24,4 +24,6 @@ public interface ProductService {
     void checkProductQuantity(Product product);
 
     void notifyAdmins(Product product);
+
+    List<Product> addProducts(List<Product> products);
 }
