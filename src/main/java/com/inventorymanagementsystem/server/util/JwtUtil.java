@@ -105,4 +105,24 @@ public class JwtUtil {
             throw new RuntimeException("Token has expired", e);
         }
     }
+
+    // New method to refresh the JWT token
+    public String refreshToken(String oldJwt) {
+        // Extract claims from the old token
+        Claims claims = extractAllClaims(oldJwt);
+
+        // Check if the token has expired
+        if (claims.getExpiration().before(new Date())) {
+            throw new RuntimeException("Token has expired and cannot be refreshed");
+        }
+
+        // Create a new token with the same claims but with a fresh expiration
+        String username = claims.getSubject();
+        String email = claims.get("email", String.class);
+        String role = claims.get("role", String.class);
+        String firstName = claims.get("first_name", String.class);
+        String address = claims.get("address", String.class);
+
+        return generateToken(username, email, role, firstName, address);
+    }
 }

@@ -117,4 +117,21 @@ public class UserController {
             return ResponseEntity.badRequest().body("Logout failed: " + e.getMessage());
         }
     }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String token) {
+        try {
+            // Extract the JWT token by removing the "Bearer " prefix
+            String jwtToken = token.replace("Bearer ", "");
+
+            // Refresh the token using JwtUtil
+            String refreshedToken = jwtUtil.refreshToken(jwtToken);
+
+            // Return the new token in the response
+            AuthenticationRespJwt authenticationRespJwt = new AuthenticationRespJwt(refreshedToken);
+            return ResponseEntity.ok(authenticationRespJwt);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Token refresh failed: " + e.getMessage());
+        }
+    }
 }
