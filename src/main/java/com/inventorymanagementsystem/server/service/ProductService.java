@@ -17,6 +17,7 @@ public interface ProductService {
     List<Product> getProductByCategory(String productCategory);
     List<Product> getAllProducts();
 
+    void deleteProductById(String id);
     void deleteProductBySkuCode(String skuCode);
     void deleteProductByName(String productName);
     void deleteProductByCategory(String productCategory);

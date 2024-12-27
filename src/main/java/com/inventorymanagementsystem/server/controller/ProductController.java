@@ -147,6 +147,17 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity<Void> deleteProductById(@PathVariable String id) { // Updated to use String
+        try {
+            productService.deleteProductById(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
     @DeleteMapping("/sku/{skuCode}")
     public ResponseEntity<Void> deleteProductBySkuCode(@PathVariable String skuCode) {
         try {
