@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/invenquity/user/**").hasRole("ADMIN")
                 .requestMatchers("/api/invenquity/product/**").permitAll()
                 .requestMatchers("/api/invenquity/notifications/**").permitAll()
+                .requestMatchers("/api/invenquity/contact/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
