@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.inventorymanagementsystem.server.dto.request.ReplyRequest;
 import com.inventorymanagementsystem.server.entities.Contact;
 import com.inventorymanagementsystem.server.service.ContactService;
 
@@ -26,5 +28,14 @@ public class ContactController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllContactMessages() {
         return ResponseEntity.ok(contactService.getAllContactMessages());
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<?> sendReplyToContact(
+        @RequestHeader("Authorization") String jwtToken,
+        @RequestBody ReplyRequest replyRequest) {
+    
+        contactService.sendReplyToContact(replyRequest.getEmail(), replyRequest.getMessage());
+        return ResponseEntity.ok("Reply sent successfully.");
     }
 }
