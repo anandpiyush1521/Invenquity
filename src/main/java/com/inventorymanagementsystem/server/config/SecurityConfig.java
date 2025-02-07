@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/invenquity/product/**").permitAll()
                 .requestMatchers("/api/invenquity/notifications/**").permitAll()
                 .requestMatchers("/api/invenquity/contact/**").permitAll()
+                .requestMatchers("/api/invenquity/subscription/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
