@@ -22,4 +22,7 @@ public interface UserRepo extends JpaRepository<User, String> {
     @Modifying
     @Query("update User u set u.password = ?2 where u.email = ?1")
     void updatePassword(String email, String password);
+
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
 }

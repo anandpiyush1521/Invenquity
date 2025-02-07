@@ -13,6 +13,7 @@ import com.inventorymanagementsystem.server.dto.request.AuthenticationRequest;
 import com.inventorymanagementsystem.server.dto.response.UserDTO;
 import com.inventorymanagementsystem.server.entities.TempUser;
 import com.inventorymanagementsystem.server.entities.User;
+import com.inventorymanagementsystem.server.helper.AdminUsernameGenerator;
 import com.inventorymanagementsystem.server.helper.EmailTemplate;
 import com.inventorymanagementsystem.server.helper.GenerateOtp;
 import com.inventorymanagementsystem.server.helper.PasswordBcrypt;
@@ -309,5 +310,37 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepo.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public User saveSubscribeUser(User user) {
+        String userId;
+        do {
+            userId = UserIdGenerator.generateProductId();
+        } while (userRepo.existsById(userId));
+        user.setId(userId);
+
+        String username;
+        do{
+            username = AdminUsernameGenerator.generateAdminUsername();
+        }while(userRepo.existsByUsername(username));
+        user.setUsername(username);
+
+        String hashPassword = PasswordBcrypt.hashPassword(user.getPassword());
+        user.setPassword(hashPassword);
+        user.setRepeat_password(hashPassword);
+        user.setRole("ADMIN");
+
+        return userRepo.save(user);
+    }
+
+    @Override
+    public boolean isEmailRegistered(String email) {
+        return userRepo.existsByEmail(email);
+    }
+
+    @Override
+    public String generateUniqueUsername() {
+        return "admin_" + UUID.randomUUID().toString().substring(0, 8);
     }
 }

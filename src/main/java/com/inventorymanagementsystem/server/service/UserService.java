@@ -9,6 +9,7 @@ import com.inventorymanagementsystem.server.entities.User;
 
 public interface UserService {
     User saveUser(User user);
+    User saveSubscribeUser(User user);
     Optional<User> getUserById(String id);
     Optional<User> updateUser(User user);
     void deleteUser(String id);
@@ -31,4 +32,7 @@ public interface UserService {
     User loginSecurity(AuthenticationRequest authenticationRequest);
 
     User getCurrentUser();
+
+    boolean isEmailRegistered(String email);
+    String generateUniqueUsername();
 }
