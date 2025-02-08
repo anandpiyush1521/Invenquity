@@ -1,11 +1,11 @@
 package com.inventorymanagementsystem.server.controller;
 
-
 import com.inventorymanagementsystem.server.entities.Subscription;
 import com.inventorymanagementsystem.server.entities.User;
 import com.inventorymanagementsystem.server.service.SubscriptionService;
 import com.inventorymanagementsystem.server.service.UserService;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/invenquity/subscription")
@@ -33,7 +32,8 @@ public class SubscriptionController {
     private UserService userService;
 
     @PostMapping("/create-checkout-session")
-    public ResponseEntity<Map<String, Object>> createCheckoutSession(@RequestBody Map<String, String> requestBody) throws StripeException {
+    public ResponseEntity<Map<String, Object>> createCheckoutSession(@RequestBody Map<String, String> requestBody)
+            throws StripeException {
         String customerEmail = requestBody.get("email");
         if (customerEmail == null || customerEmail.isEmpty()) {
             throw new IllegalArgumentException("Email is required");
@@ -44,35 +44,32 @@ public class SubscriptionController {
         }
 
         SessionCreateParams params = SessionCreateParams.builder()
-            .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-            .setCustomerEmail(customerEmail)
-            .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("http://localhost:8080/api/invenquity/subscription/success?session_id={CHECKOUT_SESSION_ID}")
-            .setCancelUrl("http://localhost:8080/api/invenquity/subscription/cancel")
-            .addLineItem(
-                SessionCreateParams.LineItem.builder()
-                    .setPriceData(
-                        SessionCreateParams.LineItem.PriceData.builder()
-                            .setCurrency("inr")
-                            .setUnitAmount(100L)
-                            .setProductData(
-                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                    .setName("Test Product")
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .setQuantity(1L)
-                    .build()
-            )
-            .setShippingAddressCollection(
-                SessionCreateParams.ShippingAddressCollection.builder()
-                    .addAllowedCountry(SessionCreateParams.ShippingAddressCollection.AllowedCountry.IN)
-                    .build()
-            )
-            .putMetadata("customer_name", "John Doe")
-            .putMetadata("customer_address", "123, Main Street, New Delhi, India")
-            .build();
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .setCustomerEmail(customerEmail)
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl(
+                        "http://localhost:8080/api/invenquity/subscription/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl("http://localhost:8080/api/invenquity/subscription/cancel")
+                .addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setPriceData(
+                                        SessionCreateParams.LineItem.PriceData.builder()
+                                                .setCurrency("inr")
+                                                .setUnitAmount(100L)
+                                                .setProductData(
+                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                .setName("Test Product")
+                                                                .build())
+                                                .build())
+                                .setQuantity(1L)
+                                .build())
+                .setShippingAddressCollection(
+                        SessionCreateParams.ShippingAddressCollection.builder()
+                                .addAllowedCountry(SessionCreateParams.ShippingAddressCollection.AllowedCountry.IN)
+                                .build())
+                .putMetadata("customer_name", "John Doe")
+                .putMetadata("customer_address", "123, Main Street, New Delhi, India")
+                .build();
 
         Session session = Session.create(params);
         Map<String, Object> result = new HashMap<>();
@@ -90,31 +87,55 @@ public class SubscriptionController {
         String paymentId = session.getPaymentIntent(); // Assuming the payment ID is available as paymentIntent
         logger.info("Retrieved payment ID: {}", paymentId);
 
+        // Retrieve the combined address from the session
+        String combinedAddress = session.getShipping().getAddress().getLine1() + ", " +
+                session.getShipping().getAddress().getLine2() + ", " +
+                session.getShipping().getAddress().getCity() + ", " +
+                session.getShipping().getAddress().getPostalCode() + ", " +
+                session.getShipping().getAddress().getState();
+
+        // Retrieve the full name from the Stripe Customer object
+        String fullName = "";
+        if (session.getCustomer() != null) {
+            Customer customer = Customer.retrieve(session.getCustomer());
+            fullName = customer.getName(); // Fetch full name from the Stripe Customer object
+        }
+
+        String firstName = "";
+        String lastName = "";
+        if (fullName != null && fullName.contains(" ")) {
+            String[] nameParts = fullName.split(" ", 2);
+            firstName = nameParts[0];
+            lastName = nameParts[1];
+        } else {
+            firstName = fullName;
+        }
+
         // Save subscription details
         Subscription subscription = Subscription.builder()
-            .email(customerEmail)
-            .country("India")
-            .amount(new BigDecimal("60"))
-            .stripeCustomerId(session.getCustomer())
-            .paymentId(paymentId) // Set the payment ID
-            .build();
+                .email(customerEmail)
+                .country("India")
+                .amount(new BigDecimal("60"))
+                .stripeCustomerId(session.getCustomer())
+                .paymentId(paymentId) // Set the payment ID
+                .build();
 
         subscriptionService.saveSubscription(subscription);
 
         // Save user details
         User user = User.builder()
-            .email(customerEmail)
-            .password("ADMIN@123456789")
-            .repeat_password("ADMIN@123456789")
-            .first_name("admin")
-            .last_name("admin")
-            .phone("1234567890")
-            .address("123, Main Street, New Delhi, India")
-            .otp("999999")
-            .isEmailVerified(true)
-            .role("ADMIN")
-            .localDateTime(LocalDateTime.now())
-            .build();
+                .email(customerEmail)
+                .password("ADMIN@123456789")
+                .repeat_password("ADMIN@123456789")
+                .first_name(firstName)
+                .last_name(lastName)
+                .phone("1234567890")
+                .address(combinedAddress) // Set the combined address
+                .otp("999999")
+                .isEmailVerified(true)
+                .role("ADMIN")
+                .localDateTime(LocalDateTime.now())
+                .build();
 
         userService.saveSubscribeUser(user);
 
