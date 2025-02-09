@@ -14,7 +14,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://gvs7vm.csb.app", "https://fl4jch.csb.app/")); // Allow frontend origin
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://gvs7vm.csb.app", "https://fl4jch.csb.app/", "https://z4wgdv.csb.app/")); // Allow frontend origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true); // Allow cookies or authentication headers

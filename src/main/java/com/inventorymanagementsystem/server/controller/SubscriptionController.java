@@ -2,14 +2,21 @@ package com.inventorymanagementsystem.server.controller;
 
 import com.inventorymanagementsystem.server.entities.Subscription;
 import com.inventorymanagementsystem.server.entities.User;
+import com.inventorymanagementsystem.server.helper.EmailTemplate;
 import com.inventorymanagementsystem.server.service.SubscriptionService;
 import com.inventorymanagementsystem.server.service.UserService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +38,9 @@ public class SubscriptionController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
     @PostMapping("/create-checkout-session")
     public ResponseEntity<Map<String, Object>> createCheckoutSession(@RequestBody Map<String, String> requestBody)
             throws StripeException {
@@ -45,6 +55,7 @@ public class SubscriptionController {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.ALIPAY)
                 .setCustomerEmail(customerEmail)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(
@@ -55,7 +66,7 @@ public class SubscriptionController {
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
                                                 .setCurrency("inr")
-                                                .setUnitAmount(100L)
+                                                .setUnitAmount(6000L)
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                                                 .setName("Test Product")
@@ -78,7 +89,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/success")
-    public String getSuccess(@RequestParam("session_id") String sessionId) throws StripeException {
+    public ResponseEntity<Void> getSuccess(@RequestParam("session_id") String sessionId) throws StripeException {
         logger.info("Payment successful for session_id: {}", sessionId);
         Session session = Session.retrieve(sessionId);
         String customerEmail = session.getCustomerEmail();
@@ -93,6 +104,8 @@ public class SubscriptionController {
                 session.getShipping().getAddress().getCity() + ", " +
                 session.getShipping().getAddress().getPostalCode() + ", " +
                 session.getShipping().getAddress().getState();
+
+        logger.info("Combine Address is: {}", combinedAddress);
 
         // Retrieve the full name from the Stripe Customer object
         String fullName = "";
@@ -139,11 +152,33 @@ public class SubscriptionController {
 
         userService.saveSubscribeUser(user);
 
-        return "Payment successful";
+
+        // Send confirmation email
+        try {
+            sendConfirmationEmail(customerEmail, firstName, lastName, "ADMIN@123456789");
+        } catch (MessagingException e) {
+            logger.error("Failed to send confirmation email: {}", e.getMessage());
+        }
+
+        // Redirect to admin login page
+        return ResponseEntity.status(302).header("Location", "http://localhost:3000/admin-login").build();
     }
 
     @GetMapping("/cancel")
     public String cancel() {
         return "Payment canceled";
+    }
+
+    private void sendConfirmationEmail(String to, String firstName, String lastName, String password) throws MessagingException {
+        String subject = "Thank you for choosing Invenquity!";
+        String text = EmailTemplate.getEmailTemplateForConfirmation(firstName, lastName, to, password);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(text, true);
+
+        mailSender.send(message);
     }
 }
