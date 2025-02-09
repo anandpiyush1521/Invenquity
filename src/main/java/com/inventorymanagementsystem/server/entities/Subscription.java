@@ -2,6 +2,8 @@ package com.inventorymanagementsystem.server.entities;
 
 import java.math.BigDecimal;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -27,4 +29,5 @@ public class Subscription {
     private BigDecimal amount;
     private String stripeCustomerId;
     private String paymentId; // Replace stripeSubscriptionId with paymentId
+    private LocalDateTime subscribedAt;
 }

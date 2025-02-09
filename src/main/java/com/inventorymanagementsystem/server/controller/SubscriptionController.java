@@ -131,6 +131,7 @@ public class SubscriptionController {
                 .amount(new BigDecimal("60"))
                 .stripeCustomerId(session.getCustomer())
                 .paymentId(paymentId) // Set the payment ID
+                .subscribedAt(LocalDateTime.now())
                 .build();
 
         subscriptionService.saveSubscription(subscription);
@@ -167,6 +168,11 @@ public class SubscriptionController {
     @GetMapping("/cancel")
     public String cancel() {
         return "Payment canceled";
+    }
+
+    @GetMapping("/all/info")
+    public ResponseEntity<?> fetchAllSubscriptionInfo(){
+        return ResponseEntity.ok(subscriptionService.getAllSubscriptions());
     }
 
     private void sendConfirmationEmail(String to, String firstName, String lastName, String password) throws MessagingException {
