@@ -286,6 +286,42 @@ public class EmailTemplate {
                 "</body>" +
                 "</html>";
     }
+
+    public static String getEmailTemplateForConfirmation(String firstName, String lastName, String email, String password) {
+        return "<html>" +
+                "<head>" +
+                "<style>" +
+                "body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
+                ".container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }" +
+                ".header { text-align: center; padding: 10px 0; border-bottom: 1px solid #eeeeee; }" +
+                ".header img { max-width: 100%; height: auto; border-radius: 10px 10px 0 0; }" +
+                ".header h2 { margin: 0; color: #333333; }" +
+                ".content { padding: 20px; }" +
+                ".content p { font-size: 16px; color: #666666; line-height: 1.5; }" +
+                ".footer { text-align: center; padding: 10px 0; border-top: 1px solid #eeeeee; font-size: 14px; color: #aaaaaa; }" +
+                "</style>" +
+                "</head>" +
+                "<body>" +
+                "<div class=\"container\">" +
+                "    <div class=\"header\">" +
+                "        <img src=\"https://res.cloudinary.com/dth5ysuhs/image/upload/v1735127095/b5qgg0b8myao8qsqmf4k.png\" alt=\"Banner\">" +
+                "        <h2>Subscription Confirmation</h2>" +
+                "    </div>" +
+                "    <div class=\"content\">" +
+                "        <p>Dear " + firstName + " " + lastName + ",</p>" +
+                "        <p>Thank you for choosing Invenquity. Your subscription is successful.</p>" +
+                "        <p>Here are your login details:</p>" +
+                "        <p>Email: " + email + "<br>Password: " + password + "</p>" +
+                "        <p>We look forward to serving you.</p>" +
+                "        <p>Best regards,<br>Invenquity Team</p>" +
+                "    </div>" +
+                "    <div class=\"footer\">" +
+                "        <p>&copy; 2024 Invenquity. All rights reserved.</p>" +
+                "    </div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+    }
     
     
 }
