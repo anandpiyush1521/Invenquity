@@ -20,7 +20,11 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<List<Notification>> getAllNotificationsSortedByDateTime() {
-        List<Notification> notifications = notificationService.getAllNotificationsSortedByDateTime();
-        return ResponseEntity.ok(notifications);
+        try {
+            List<Notification> notifications = notificationService.getAllNotificationsSortedByDateTime();
+            return ResponseEntity.ok(notifications);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 }
