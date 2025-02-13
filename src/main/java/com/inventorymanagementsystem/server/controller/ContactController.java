@@ -38,4 +38,9 @@ public class ContactController {
         contactService.sendReplyToContact(replyRequest.getEmail(), replyRequest.getMessage());
         return ResponseEntity.ok("Reply sent successfully.");
     }
+
+    @GetMapping("/unreplied")
+    public ResponseEntity<?> getUnrepliedContactMessages() {
+        return ResponseEntity.ok(contactService.getUnrepliedContactMessages());
+    }
 }

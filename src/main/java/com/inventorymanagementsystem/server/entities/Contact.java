@@ -34,4 +34,7 @@ public class Contact {
     private String message;
 
     private LocalDateTime createdAt;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean replied;
 }

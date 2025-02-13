@@ -22,6 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,6 +157,8 @@ public class SubscriptionController {
 
         userService.saveSubscribeUser(user);
 
+        // Create a new schema or database for the user
+        createDatabaseForUser(customerEmail);
 
         // Send confirmation email
         try {
@@ -163,6 +169,23 @@ public class SubscriptionController {
 
         // Redirect to admin login page
         return ResponseEntity.status(302).header("Location", "http://localhost:3000/admin-login").build();
+    }
+
+    private void createDatabaseForUser(String email) {
+        // Logic to create a new schema or database for the user
+        // This can be done using JDBC or any other database management tool
+        String schemaName = email.replaceAll("[^a-zA-Z0-9]", "_");
+        String createSchemaSQL = "CREATE SCHEMA " + schemaName;
+
+        try (Connection connection = DriverManager.getConnection(
+            "jdbc:postgresql://dpg-cughpt2j1k6c73duirlg-a.oregon-postgres.render.com:5432/invenquitytest",
+            "postgress", "qzuSRj7XeSkp01atDhpCWV2NP4oaHtOb");
+            Statement statement = connection.createStatement()) {
+            statement.executeUpdate(createSchemaSQL);
+            logger.info("Schema created for user: {}", email);
+        } catch (SQLException e) {
+            logger.error("Failed to create schema for user: {}", email, e);
+        }
     }
 
     @GetMapping("/cancel")

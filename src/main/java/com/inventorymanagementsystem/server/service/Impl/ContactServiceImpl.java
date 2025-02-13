@@ -48,7 +48,7 @@ public class ContactServiceImpl implements ContactService{
 
     @Override
     public void sendReplyToContact(String email, String replyMessage) {
-        String userEmail = "piyushanand2580@gmail.com"; //Admin user email
+        String userEmail = "piyushanand2580@gmail.com"; // Admin user email
         logger.info("Admin User Email: " + userEmail);
 
         Contact contact = contactRepo.findByEmail(email); // Get contact by provided email
@@ -56,9 +56,20 @@ public class ContactServiceImpl implements ContactService{
             String subject = "Reply to: " + contact.getSubject();
             String message = EmailTemplate.getEmailTemplateForReply(contact.getFirstName(), contact.getLastName(), subject, replyMessage, userEmail);
             emailService.sendEmail(contact.getEmail(), subject, message);
-            logger.info("Reply sent to: " + contact.getEmail());
+        
+            // Mark as replied
+            contact.setReplied(true);
+            contactRepo.save(contact);
+
+            logger.info("Reply sent and marked as replied for: " + contact.getEmail());
         } else {
             logger.warn("No contact found with email: " + email);
         }
+    }
+
+
+    @Override
+    public List<Contact> getUnrepliedContactMessages() {
+        return contactRepo.findByRepliedFalse();
     }
 }
