@@ -1,7 +1,17 @@
 # Invenquity
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Powered_by-Spring_Boot-green?style=for-the-badge&logo=spring-boot" alt="Powered by Spring Boot">
+  <img src="https://img.shields.io/badge/Powered_by-React-blue?style=for-the-badge&logo=react" alt="Powered by React">
+  <img src="https://img.shields.io/badge/Powered_by-Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Powered by Tailwind CSS">
+  <img src="https://img.shields.io/badge/Powered_by-PostgreSQL-316192?style=for-the-badge&logo=postgresql" alt="Powered by PostgreSQL">
+</p>
+
 Invenquity is an **inventory management system** that helps businesses *track products*, manage *users* (including registration, login, and profiles), handle *subscriptions*, and manage *customer contact messages*. It includes features for notifying admins about low stock and uses **JWT security** for API protection and an **email service** for notifications and verification.
 
+<p align="center">
+  <img src="https://res.cloudinary.com/dth5ysuhs/image/upload/v1735325237/Screenshot_204_tvj1hf.png" width="1000" alt="Home Image" style="border: 2px solid beige;">
+</p>
 
 ## Visual Overview
 
