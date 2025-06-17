@@ -1,4 +1,4 @@
-# Tutorial: Invenquity
+# Invenquity
 
 Invenquity is an **inventory management system** that helps businesses *track products*, manage *users* (including registration, login, and profiles), handle *subscriptions*, and manage *customer contact messages*. It includes features for notifying admins about low stock and uses **JWT security** for API protection and an **email service** for notifications and verification.
 
