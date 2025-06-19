@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/Powered_by-React-blue?style=for-the-badge&logo=react" alt="Powered by React">
   <img src="https://img.shields.io/badge/Powered_by-Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwind-css" alt="Powered by Tailwind CSS">
   <img src="https://img.shields.io/badge/Powered_by-PostgreSQL-316192?style=for-the-badge&logo=postgresql" alt="Powered by PostgreSQL">
+  <img src="https://img.shields.io/badge/Payment_by-Stripe-008CDD?style=for-the-badge&logo=stripe&logoColor=white" alt="Payment by Stripe">
 </p>
 
 Invenquity is an **inventory management system** that helps businesses *track products*, manage *users* (including registration, login, and profiles), handle *subscriptions*, and manage *customer contact messages*. It includes features for notifying admins about low stock and uses **JWT security** for API protection and an **email service** for notifications and verification.
