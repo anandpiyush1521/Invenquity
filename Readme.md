@@ -1876,3 +1876,9 @@ Helper/Utility classes are like the essential, specialized tools in your develop
 With this chapter, we have now covered the main architectural components and common utility patterns used in the Invenquity backend application!
 
 ---
+
+For detailed information, please refer to the individual repositories:
+
+- [Invenquity Frontend](https://github.com/anandpiyush1521/Invenquity-frontend)
+- [Invenquity Backend](https://github.com/anandpiyush1521/Invenquity)
+
