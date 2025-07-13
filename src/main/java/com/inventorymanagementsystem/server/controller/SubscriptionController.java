@@ -59,7 +59,6 @@ public class SubscriptionController {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.ALIPAY)
                 .setCustomerEmail(customerEmail)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(
